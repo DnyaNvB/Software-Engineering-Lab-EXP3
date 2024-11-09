@@ -75,7 +75,7 @@ public class UserRepositoryTest {
         String username = "reza";
         String password = "123abc";
         String email = "reza@sharif.edu";
-        User newUser = new User(username, password);
+        User newUser = new User(username, password, email);
 
         // When
         boolean result = repository.addUser(newUser);
