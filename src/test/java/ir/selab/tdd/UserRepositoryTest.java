@@ -37,9 +37,31 @@ public class UserRepositoryTest {
     }
 
     @Test
+    public void getUserByEmail__ShouldReturnUser() {
+        User user = repository.getUserByEmail("dni@gmail.com");
+        assertNotNull(user);
+        assertEquals("dni", user.getUsername());
+    }
+
+    @Test
+    public void getUserByEmail__NonExistingEmail__ShouldReturnNull() {
+        User user = repository.getUserByEmail("nonexistent@gmail.com");
+        assertNull(user);
+    }
+
+    @Test
     public void createRepositoryWithDuplicateUsers__ShouldThrowException() {
-        User user1 = new User("ali", "1234");
-        User user2 = new User("ali", "4567");
+        User user1 = new User("ali", "1234", "ali1@gmail.com");
+        User user2 = new User("ali", "4567", "ali2@gmail.com");
+        assertThrows(IllegalArgumentException.class, () -> {
+            new UserRepository(List.of(user1, user2));
+        });
+    }
+
+    @Test
+    public void createRepositoryWithDuplicateEmails__ShouldThrowException() {
+        User user1 = new User("dani", "1234", "dni@gmail.com");
+        User user2 = new User("doni", "4567", "dni@gmail.com");
         assertThrows(IllegalArgumentException.class, () -> {
             new UserRepository(List.of(user1, user2));
         });
@@ -56,9 +78,69 @@ public class UserRepositoryTest {
         User newUser = new User(username, password);
 
         // When
-        repository.addUser(newUser);
+        boolean result = repository.addUser(newUser);
 
         // Then
+        assertTrue(result);
         assertEquals(oldUserCount + 1, repository.getUserCount());
+        User retrievedUser = repository.getUserByUsername(username);
+        assertNotNull(retrievedUser);
+        assertEquals(email, retrievedUser.getEmail());    }
+
+    @Test
+    public void addExistingUser__ShouldReturnFalse() {
+        User existingUser = new User("ali", "somepassword", "ali_new@example.com");
+        boolean result = repository.addUser(existingUser);
+        assertFalse(result);
+    }
+
+    @Test
+    public void addUserWithDuplicateEmail__ShouldReturnFalse() {
+        User newUser = new User("reza", "123abc", "ali@example.com"); // Email already exists
+        boolean result = repository.addUser(newUser);
+        assertFalse(result);
+    }
+
+    @Test
+    public void removeExistingUser__ShouldReturnTrue() {
+        boolean result = repository.removeUser("ali");
+        assertTrue(result);
+        assertNull(repository.getUserByUsername("ali"));
+        assertNull(repository.getUserByEmail("ali@example.com"));
+    }
+
+    @Test
+    public void removeNonExistingUser__ShouldReturnFalse() {
+        boolean result = repository.removeUser("nonexistent");
+        assertFalse(result);
+    }
+
+    @Test
+    public void changeUserEmail__ShouldReturnTrue() {
+        boolean result = repository.changeUserEmail("ali", "ali_new@example.com");
+        assertTrue(result);
+        User user = repository.getUserByUsername("ali");
+        assertEquals("ali_new@example.com", user.getEmail());
+        assertNull(repository.getUserByEmail("ali@example.com"));
+        assertEquals(user, repository.getUserByEmail("ali_new@example.com"));
+    }
+
+    @Test
+    public void changeUserEmailToExistingEmail__ShouldReturnFalse() {
+        boolean result = repository.changeUserEmail("ali", "mohammad@example.com"); // Email already used
+        assertFalse(result);
+    }
+
+    @Test
+    public void changeUserEmailForNonExistingUser__ShouldReturnFalse() {
+        boolean result = repository.changeUserEmail("nonexistent", "new@example.com");
+        assertFalse(result);
+    }
+
+    @Test
+    public void getAllUsers__ShouldReturnAllUsers() {
+        List<User> users = repository.getAllUsers();
+        assertNotNull(users);
+        assertEquals(3, users.size());
     }
 }
