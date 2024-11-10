@@ -43,7 +43,7 @@ public class UserServiceTest {
     public void createUserWithExistingEmail__ShouldFail() {
         String username = "reza";
         String password = "123abc";
-        String email = "ali@example.com"; // Email already used
+        String email = "ali@gmail.com"; // Email already used
         boolean result = userService.registerUser(username, password, email);
         assertFalse(result);
     }
@@ -68,13 +68,13 @@ public class UserServiceTest {
 
     @Test
     public void loginWithEmail__ValidCredentials__ShouldSuccess() {
-        boolean login = userService.loginWithEmail("admin@example.com", "1234");
+        boolean login = userService.loginWithEmail("admin@gmail.com", "1234");
         assertTrue(login);
     }
 
     @Test
     public void loginWithEmail__InvalidPassword__ShouldFail() {
-        boolean login = userService.loginWithEmail("admin@example.com", "wrongpassword");
+        boolean login = userService.loginWithEmail("admin@gmail.com", "wrongpassword");
         assertFalse(login);
     }
 
@@ -108,7 +108,7 @@ public class UserServiceTest {
     public void changeUserEmail__ShouldReturnTrue() {
         boolean result = userService.changeUserEmail("ali", "ali_new@example.com");
         assertTrue(result);
-        boolean loginWithOldEmail = userService.loginWithEmail("ali@example.com", "qwert");
+        boolean loginWithOldEmail = userService.loginWithEmail("ali@gmail.com", "qwert");
         assertFalse(loginWithOldEmail);
         boolean loginWithNewEmail = userService.loginWithEmail("ali_new@example.com", "qwert");
         assertTrue(loginWithNewEmail);
@@ -116,7 +116,7 @@ public class UserServiceTest {
 
     @Test
     public void changeUserEmailToExistingEmail__ShouldReturnFalse() {
-        boolean result = userService.changeUserEmail("ali", "admin@example.com");
+        boolean result = userService.changeUserEmail("ali", "admin@gmail.com");
         assertFalse(result);
     }
 
