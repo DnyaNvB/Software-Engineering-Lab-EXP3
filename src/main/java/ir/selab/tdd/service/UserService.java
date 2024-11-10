@@ -26,14 +26,8 @@ public class UserService {
         return userByEmail.getPassword().equals(password);
     }
 
-    public boolean registerUser(String username, String password) {
-        User user = new User(username, password);
-        return repository.addUser(user);
-    }
-
     public boolean registerUser(String username, String password, String email) {
-        User user = new User(username, password);
-        user.setEmail(email);
+        User user = new User(username, password, email);
         return repository.addUser(user);
     }
 
