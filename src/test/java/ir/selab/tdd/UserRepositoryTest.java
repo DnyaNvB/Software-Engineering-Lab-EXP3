@@ -16,14 +16,14 @@ public class UserRepositoryTest {
     @Before
     public void setUp() {
         List<User> userList = Arrays.asList(
-            new User("admin", "1234", "admin@gmail.com"),
-            new User("ali", "qwert", "ali@gmail.com"),
-            new User("mohammad", "123asd", "mohammad@gmail.com"));
+                new User("admin", "1234", "admin@gmail.com"),
+                new User("ali", "qwert", "ali@gmail.com"),
+                new User("mohammad", "123asd", "mohammad@gmail.com"));
         repository = new UserRepository(userList);
     }
 
     @Test
-    public void getContainingUser__ShouldReturn() {
+    public void getUserByUsername__ExistingUser_ShouldReturnUser() {
         User ali = repository.getUserByUsername("ali");
         assertNotNull(ali);
         assertEquals("ali", ali.getUsername());
@@ -31,16 +31,16 @@ public class UserRepositoryTest {
     }
 
     @Test
-    public void getNotContainingUser__ShouldReturnNull() {
+    public void getUserByUsername__NonExistingUser_ShouldReturnNull() {
         User user = repository.getUserByUsername("reza");
         assertNull(user);
     }
 
     @Test
-    public void getUserByEmail__ShouldReturnUser() {
-        User user = repository.getUserByEmail("dni@gmail.com");
+    public void getUserByEmail__ExistingUser_ShouldReturnUser() {
+        User user = repository.getUserByEmail("mohammad@gmail.com");
         assertNotNull(user);
-        assertEquals("dni", user.getUsername());
+        assertEquals("mohammad", user.getUsername());
     }
 
     @Test
@@ -96,7 +96,7 @@ public class UserRepositoryTest {
 
     @Test
     public void addUserWithDuplicateEmail__ShouldReturnFalse() {
-        User newUser = new User("reza", "123abc", "ali@example.com"); // Email already exists
+        User newUser = new User("reza", "123abc", "ali@gmail.com"); // Email already exists
         boolean result = repository.addUser(newUser);
         assertFalse(result);
     }
@@ -106,7 +106,7 @@ public class UserRepositoryTest {
         boolean result = repository.removeUser("ali");
         assertTrue(result);
         assertNull(repository.getUserByUsername("ali"));
-        assertNull(repository.getUserByEmail("ali@example.com"));
+        assertNull(repository.getUserByEmail("ali@gmail.com"));
     }
 
     @Test
@@ -121,13 +121,13 @@ public class UserRepositoryTest {
         assertTrue(result);
         User user = repository.getUserByUsername("ali");
         assertEquals("ali_new@example.com", user.getEmail());
-        assertNull(repository.getUserByEmail("ali@example.com"));
+        assertNull(repository.getUserByEmail("ali@gmail.com"));
         assertEquals(user, repository.getUserByEmail("ali_new@example.com"));
     }
 
     @Test
     public void changeUserEmailToExistingEmail__ShouldReturnFalse() {
-        boolean result = repository.changeUserEmail("ali", "mohammad@example.com"); // Email already used
+        boolean result = repository.changeUserEmail("ali", "mohammad@gmail.com"); // Email already used
         assertFalse(result);
     }
 
