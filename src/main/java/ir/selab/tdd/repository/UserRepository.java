@@ -6,19 +6,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class UserRepository {
     private final Map<String, User> usersByUserName;
     private final Map<String, User> usersByEmail;
 
     public UserRepository(List<User> users) {
-        this.usersByUserName = users.stream().collect(Collectors.toMap(User::getUsername, u -> u, (u1, u2) -> {
-            throw new IllegalArgumentException("Two users can not have the same username");
-        }));
-
+        this.usersByUserName = new HashMap<>();
         this.usersByEmail = new HashMap<>();
+
         for (User user : users) {
+            if (usersByUserName.containsKey(user.getUsername())) {
+                throw new IllegalArgumentException("Two users cannot have the same username");
+            }
+            usersByUserName.put(user.getUsername(), user);
+
             String email = user.getEmail();
             if (email != null) {
                 if (usersByEmail.containsKey(email)) {
@@ -38,10 +40,8 @@ public class UserRepository {
     }
 
     public boolean addUser(User user) {
-        if (usersByUserName.containsKey(user.getUsername())) {
-            return false;
-        }
-        if (user.getEmail() != null && usersByEmail.containsKey(user.getEmail())) {
+        if (usersByUserName.containsKey(user.getUsername()) ||
+                (user.getEmail() != null && usersByEmail.containsKey(user.getEmail()))) {
             return false;
         }
         usersByUserName.put(user.getUsername(), user);
@@ -68,10 +68,7 @@ public class UserRepository {
 
     public boolean changeUserEmail(String username, String newEmail) {
         User user = usersByUserName.get(username);
-        if (user == null || newEmail == null || newEmail.isEmpty()) {
-            return false;
-        }
-        if (usersByEmail.containsKey(newEmail)) {
+        if (user == null || newEmail == null || newEmail.isEmpty() || usersByEmail.containsKey(newEmail)) {
             return false;
         }
         String oldEmail = user.getEmail();
